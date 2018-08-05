@@ -17,8 +17,8 @@ x_axis_dict = {'D':['пн','вт','ср','чт','пт','сб','вс'],
                     'August', 'September', 'October', 'November', 'December'],
                'H':range(0,24)}
 D_dict = {0:'пн',1:'вт',2:'ср',3:'чт',4:'пт',5:'сб',6:'вс'}
-M_dict = {0:'January', 1:'February', 2:'March', 3:'April', 4:'May', 5:'June', 6:'July',
-          7:'August', 8:'September', 9:'October', 10:'November', 11:'December'}
+M_dict = {0:'Jan', 1:'Feb', 2:'Mar', 3:'Apr', 4:'May', 5:'Jun', 6:'Jul',
+          7:'Aug', 8:'Sep', 9:'Oct', 10:'Nov', 11:'Dec'} ###############
 
 app = dash.Dash()
 app.layout = html.Div([ # Самый большой контейнер
@@ -28,22 +28,22 @@ app.layout = html.Div([ # Самый большой контейнер
         html.Div([dcc.RangeSlider( # слайдер дней недели
             id = 'week_day_lim',
             marks={i: D_dict[i] for i in range(7)},
-            min=0,max=7,
-            value=[0, 6]
+            min=0,max=6,
+            value=[0, 6]   #######################
                        )], style={'width': '48%','display': 'inline-block','float':'left'}),
         html.Div([dcc.RangeSlider( # слайдер месяца недели
             id = 'month_lim',
             marks={i: M_dict[i] for i in range(12)},
-            min=0,max=12,
-            value=[0, 6]
-                       )], style={'width': '48%','display': 'inline-block','float':'left'})
-            ]),
+            min=0,max=11,
+            value=[0, 11]  ########################
+                       )], style={'width': '48%', 'magin-left': '3px', 'display': 'inline-block','float':'left'})
+            ], style={'width': '100%', 'display': 'inline-block','float':'left'}),
     html.Div([ # График с деньгами
         html.Div([dcc.Dropdown(
                     id='xaxis-column',
                     options=[{'label': i[1], 'value': i[0]} for i in xs],
                     value='M'
-                )],style={'width': '48%',#'display': 'inline-block'
+                )],style={'width': '48%','display': 'inline-block'
                          }),
         html.Div([dcc.Dropdown(
                     id='yaxis-column',

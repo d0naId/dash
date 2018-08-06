@@ -9,8 +9,10 @@ import plotly.graph_objs as go
 
 finance = pd.read_pickle('finance.pcl') # DF for finance
 
-xs = np.array([['D', 'Агрегация по дням недели'], ['M','Агрегация по ме сяцам'], ['H','Агрегация по времени суток']])
+xs = np.array([['D', 'Агрегация по дням недели'], ['M','Агрегация по месяцам'], ['H','Агрегация по времени суток']])
 ys = np.array([['ORDER_ID','Количество ордеров (шт)'], ['SUM','Сумма чеков (руб)']])
+
+soc_xs = np.array([['AGE','Возраст'],['SEX','Пол']])
 
 x_axis_dict = {'D':['пн','вт','ср','чт','пт','сб','вс'],
                'M':['January', 'February', 'March', 'April', 'May', 'June', 'July',
@@ -50,18 +52,35 @@ app.layout = html.Div([ # Самый большой контейнер
                     options=[{'label': i[1], 'value': i[0]} for i in ys],
                     value='ORDER_ID'
                 )],style={'width': '48%','display': 'inline-block'}),
-        dcc.Graph(id='indicator-graphic',config={'displayModeBar':False})],
-                  style={'width': '50%','hight':'10%',  'display': 'inline-block'
-                  }
-            )
-
-                     ])
-@app.callback(dash.dependencies.Output('indicator-graphic', 'figure'),
+        dcc.Graph(id='fin_ind',config={'displayModeBar':False})],
+                  style={'width': '50%','hight':'10%',  'display': 'inline-block'}
+            ),
+    html.Div([ # График с social
+        html.Div([dcc.Dropdown(
+                    id='soc_y',
+                    options=[{'label': i[1], 'value': i[0]} for i in ys],
+                    value='ORDER_ID'
+                )],style={'width': '48%','display': 'inline-block'}),
+        html.Div([dcc.Checklist(
+                    id = 'soc_x',
+                    options=[
+                        {'label': 'Пол', 'value': 'SEX'},
+                        {'label': 'Возраст', 'value': 'AGE'}
+                    ],
+                    values=['SEX', 'AGE'],
+                    labelStyle={'display': 'inline-block'}
+                )
+            ], style = {'width': '50%','height':'10%',  'display': 'inline-block'}
+            ),
+        dcc.Graph(id='soc_ind',config={'displayModeBar':False})],
+                  style={'width': '50%','height':'10%',  'display': 'inline-block'})
+        ])
+@app.callback(dash.dependencies.Output('fin_ind', 'figure'),
                 [dash.dependencies.Input('xaxis-column', 'value'),
                  dash.dependencies.Input('yaxis-column', 'value'),
                  dash.dependencies.Input('week_day_lim', 'value'),
                  dash.dependencies.Input('month_lim', 'value'),])
-def update_graph(xaxis_column_name, yaxis_column_name, week_day_lim, month_lim):
+def update_graph_fin(xaxis_column_name, yaxis_column_name, week_day_lim, month_lim):
     agg_dict = {'ORDER_ID':'count', 'SUM':'sum'} #словарь с правилом для агрегации
     axis_name_dict = {'ORDER_ID':'Количество орддеров','SUM':'Сумма чеков',
                       'D':'День недели','H':'Время (часы)','M':'Месяц'} # СЛоварь для подписей к осям
@@ -78,6 +97,40 @@ def update_graph(xaxis_column_name, yaxis_column_name, week_day_lim, month_lim):
                 mode='lines+markers',
                 marker={'size': 15, 'opacity': 0.5, 'line': {'width': 0.5, 'color': 'white'}}
                 )],
+            'layout': go.Layout(
+                xaxis={
+                    'title': axis_name_dict[xaxis_column_name],
+                    #'type': 'linear' if xaxis_type == 'Linear' else 'log'
+                },
+                yaxis={
+                    'title': axis_name_dict[yaxis_column_name],
+                    #'type': 'linear' if yaxis_type == 'Linear' else 'log'
+                },
+                margin={'l': 100, 'b': 70, 't': 0, 'r': 15},
+                #hovermode='closest'
+            )
+        }
+
+@app.callback(dash.dependencies.Output('soc_ind', 'figure'),
+                [dash.dependencies.Input('soc_x', 'values'),
+                 dash.dependencies.Input('soc_y', 'value'),
+                 dash.dependencies.Input('week_day_lim', 'value'),
+                 dash.dependencies.Input('month_lim', 'value'),])
+def update_graph_soc(soc_x, soc_y, week_day_lim, month_lim):
+    agg_dict = {'ORDER_ID':'count', 'SUM':'sum'} #словарь с правилом для агрегации
+    axis_name_dict = {'ORDER_ID':'Количество орддеров','SUM':'Сумма чеков',
+                      'D':'День недели','H':'Время (часы)','M':'Месяц'} # СЛоварь для подписей к осям
+    social = pd.read_pickle('social.pcl')
+    df = social[(social.D_N>=week_day_lim[0])&(social.D_N<=week_day_lim[1])&
+                 (social.M_N>=month_lim[0])&(social.M_N<=month_lim[1])]
+    return {
+            'data': [go.Histogram(
+                histfunc = "count",
+                x = df[df[soc_x[0]]],
+                y = df[soc_y],
+                name = "count"
+              ),
+],
             'layout': go.Layout(
                 xaxis={
                     'title': axis_name_dict[xaxis_column_name],

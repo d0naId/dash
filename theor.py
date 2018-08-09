@@ -123,25 +123,24 @@ def update_graph_soc(soc_x, soc_y, week_day_lim, month_lim):
     social = pd.read_pickle('social.pcl')
     df = social[(social.D_N>=week_day_lim[0])&(social.D_N<=week_day_lim[1])&
                  (social.M_N>=month_lim[0])&(social.M_N<=month_lim[1])]
+    sex_list = ['Не указан', 'М','Ж']
     return {
-            'data': [go.Histogram(
-                histfunc = "count",
-                x = df[df[soc_x[0]]],
-                y = df[soc_y],
-                name = "count"
-              ),
-],
+            'data': [go.Bar(
+                x=sex_list,
+                y=[df[(df.SEX==i)&(social.AGE_GROUP == j)]['ORDER_ID'].count() for i in sex_list],
+                name = j) for j in ['Не указан','0-4','4-14', '14-21','21-35', '35-50',  '50-']
+                ],
             'layout': go.Layout(
                 xaxis={
-                    'title': axis_name_dict[xaxis_column_name],
+                    #'title': axis_name_dict[xaxis_column_name],
                     #'type': 'linear' if xaxis_type == 'Linear' else 'log'
                 },
                 yaxis={
-                    'title': axis_name_dict[yaxis_column_name],
+                    #'title': axis_name_dict[yaxis_column_name],
                     #'type': 'linear' if yaxis_type == 'Linear' else 'log'
                 },
                 margin={'l': 100, 'b': 70, 't': 0, 'r': 15},
-                #hovermode='closest'
+                hovermode='closest'
             )
         }
 

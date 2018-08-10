@@ -21,7 +21,7 @@ x_axis_dict = {'D':['пн','вт','ср','чт','пт','сб','вс'],
 D_dict = {0:'пн',1:'вт',2:'ср',3:'чт',4:'пт',5:'сб',6:'вс'}
 M_dict = {0:'January', 1:'February', 2:'March', 3:'April', 4:'May', 5:'June', 6:'July',
           7:'August', 8:'September', 9:'October', 10:'November', 11:'December'}
-
+agg_dict = {'ORDER_ID':'count', 'SUM':'sum'} #словарь с правилом для агрегации
 app = dash.Dash()
 app.layout = html.Div([ # Самый большой контейнер
     html.Div([ # Строка с заголовком и слайдерами
@@ -81,7 +81,7 @@ app.layout = html.Div([ # Самый большой контейнер
                  dash.dependencies.Input('week_day_lim', 'value'),
                  dash.dependencies.Input('month_lim', 'value'),])
 def update_graph_fin(xaxis_column_name, yaxis_column_name, week_day_lim, month_lim):
-    agg_dict = {'ORDER_ID':'count', 'SUM':'sum'} #словарь с правилом для агрегации
+
     axis_name_dict = {'ORDER_ID':'Количество орддеров','SUM':'Сумма чеков',
                       'D':'День недели','H':'Время (часы)','M':'Месяц'} # СЛоварь для подписей к осям
 
@@ -124,10 +124,14 @@ def update_graph_soc(soc_x, soc_y, week_day_lim, month_lim):
     df = social[(social.D_N>=week_day_lim[0])&(social.D_N<=week_day_lim[1])&
                  (social.M_N>=month_lim[0])&(social.M_N<=month_lim[1])]
     sex_list = ['Не указан', 'М','Ж']
+    print(soc_y)
     return {
             'data': [go.Bar(
                 x=sex_list,
-                y=[df[(df.SEX==i)&(social.AGE_GROUP == j)]['ORDER_ID'].count() for i in sex_list],
+                y=[df[(df.SEX==i)&
+                      (df.AGE_GROUP == j)][
+                        ['SUM']
+                        ].agg(agg_dict[soc_y]).values[0] for i in sex_list],
                 name = j) for j in ['Не указан','0-4','4-14', '14-21','21-35', '35-50',  '50-']
                 ],
             'layout': go.Layout(

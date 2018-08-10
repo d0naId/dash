@@ -115,7 +115,8 @@ def update_graph_fin(xaxis_column_name, yaxis_column_name, week_day_lim, month_l
                 [dash.dependencies.Input('soc_x', 'values'),
                  dash.dependencies.Input('soc_y', 'value'),
                  dash.dependencies.Input('week_day_lim', 'value'),
-                 dash.dependencies.Input('month_lim', 'value'),])
+                 dash.dependencies.Input('month_lim', 'value')
+                 ])
 def update_graph_soc(soc_x, soc_y, week_day_lim, month_lim):
     agg_dict = {'ORDER_ID':'count', 'SUM':'sum'} #словарь с правилом для агрегации
     axis_name_dict = {'ORDER_ID':'Количество орддеров','SUM':'Сумма чеков',
@@ -124,15 +125,32 @@ def update_graph_soc(soc_x, soc_y, week_day_lim, month_lim):
     df = social[(social.D_N>=week_day_lim[0])&(social.D_N<=week_day_lim[1])&
                  (social.M_N>=month_lim[0])&(social.M_N<=month_lim[1])]
     sex_list = ['Не указан', 'М','Ж']
+    age_list = ['Не указан','0-4','4-14', '14-21','21-35', '35-50',  '50-']
     print(soc_y)
     return {
             'data': [go.Bar(
                 x=sex_list,
-                y=[df[(df.SEX==i)&
-                      (df.AGE_GROUP == j)][
-                        ['SUM']
-                        ].agg(agg_dict[soc_y]).values[0] for i in sex_list],
-                name = j) for j in ['Не указан','0-4','4-14', '14-21','21-35', '35-50',  '50-']
+                if ('SEX' in soc_x) and ('AGE_GROUP' in soc_x):
+                    y=[df[(df.SEX==i)&
+                          (df.AGE_GROUP == j)][
+                          ['SUM']
+                          ].agg(agg_dict[soc_y]).values[0] for i in sex_list],
+                          name = j) for j in age_list
+                elif 'SEX' in soc_x:
+                    y=[df[(df.SEX==i)][
+                          ['SUM']
+                          ].agg(agg_dict[soc_y]).values[0] for i in sex_list],
+                          name = j) for j in age_list
+                elif  'AGE_GROUP' in soc_x:
+                    y=[df[(df.AGE_GROUP == j)][
+                          ['SUM']
+                          ].agg(agg_dict[soc_y]).values[0] for i in sex_list],
+                          name = j) for j in age_list
+                else:
+                    y = df[['SUM']].agg(agg_dict[soc_y]).values[0]
+                           for i in sex_list
+                           ],
+                          name = j) for j in age_list
                 ],
             'layout': go.Layout(
                 xaxis={

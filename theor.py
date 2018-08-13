@@ -155,8 +155,13 @@ def update_graph_soc(soc_x, soc_y, week_day_lim, month_lim):
             name = j) for j in age_list
             ]
     else:
-        yy = df[['SUM']].agg(agg_dict[soc_y]).values[0]
-
+        print(3)
+        data = [
+        go.Bar(
+            x=sex_list,
+            y = df[['SUM']].agg(agg_dict[soc_y]).values[0],
+            name = 'name')
+            ]
     return {
             'data': data,
             'layout': go.Layout(

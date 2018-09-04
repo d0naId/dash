@@ -111,10 +111,21 @@ def update_graph_fin(xaxis_column_name, yaxis_column_name, week_day_lim, month_l
                  (finance.M_N>=month_lim[0])&(finance.M_N<=month_lim[1])][
                     [xaxis_column_name,yaxis_column_name]].fillna(0).groupby(
                         xaxis_column_name).agg(agg_dict[yaxis_column_name])
+    print (xaxis_column_name)
+    if xaxis_column_name == 'D':
+        min_x = week_day_lim[0]
+        max_x = week_day_lim[1]
+    elif xaxis_column_name == 'M':
+        min_x = month_lim[0]
+        max_x = month_lim[1]
+    elif xaxis_column_name == 'H':
+        min_x = 0
+        max_x = 25
+
     return {
             'data': [go.Scatter(
-                y=df.loc[x_axis_dict[xaxis_column_name]][yaxis_column_name],
-                x=df.loc[x_axis_dict[xaxis_column_name]].index,
+                y=df.loc[x_axis_dict[xaxis_column_name][min_x:max_x+1]][yaxis_column_name],
+                x=df.loc[x_axis_dict[xaxis_column_name][min_x:max_x+1]].index,
                 text='blablabla',
                 mode='lines+markers',
                 marker={'size': 15, 'opacity': 0.5, 'line': {'width': 0.5, 'color': 'white'}}

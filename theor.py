@@ -165,28 +165,28 @@ def update_graph_soc(soc_x, soc_y, week_day_lim, month_lim, soc_sexs, soc_ages):
     age_list = ['Не указан','0-4','4-14', '14-21','21-35', '35-50',  '50-']
     if ('SEX' in soc_x) and ('AGE' in soc_x):
         data = [go.Bar(
-            x=sex_list,
+            x = [s for s in sex_list if s in soc_sexs],
             y = [df[(df.SEX==i)&
                   (df.AGE_GROUP == j)][
                   ['SUM']
-                  ].agg(agg_dict[soc_y]).values[0] for i in sex_list],
-            name = j) for j in age_list
+                  ].agg(agg_dict[soc_y]).values[0] for i in sex_list if i in soc_sexs],
+            name = j) for j in age_list if j in soc_ages
             ]
     elif 'SEX' in soc_x:
         data = [go.Bar(
-            x=sex_list,
+            x= [s for s in sex_list if s in soc_sexs],
             y = [df[(df.SEX==i)][
                   ['SUM']
-                  ].agg(agg_dict[soc_y]).values[0] for i in sex_list],
+                  ].agg(agg_dict[soc_y]).values[0] for i in sex_list if i in soc_sexs],
             name = 'value')]
     elif  'AGE' in soc_x:
         data = [
         go.Bar(
-            x=sex_list,
+            x= [s for s in age_list if s in soc_ages],
             y = [df[(df.AGE_GROUP == j)][
                   ['SUM']
-                  ].agg(agg_dict[soc_y]).values[0]],
-            name = j) for j in age_list
+                  ].agg(agg_dict[soc_y]).values[0] for j in age_list if j in soc_ages],
+            name = 'value') 
             ]
     else:
         data = [

@@ -18,50 +18,64 @@ x_axis_dict = {'D':['пн','вт','ср','чт','пт','сб','вс'],
                     'August', 'September', 'October', 'November', 'December'],
                'H':range(0,24)}
 D_dict = {0:'пн',1:'вт',2:'ср',3:'чт',4:'пт',5:'сб',6:'вс'}
-M_dict = {0:'January', 1:'February', 2:'March', 3:'April', 4:'May', 5:'June', 6:'July',
-          7:'August', 8:'September', 9:'October', 10:'November', 11:'December'}
+M_dict = {0:'Jan', 1:'Feb', 2:'Mar', 3:'Apr', 4:'May', 5:'Jun', 6:'Jul',
+          7:'Aug', 8:'Sep', 9:'Oct', 10:'Nov', 11:'Dec'}
 agg_dict = {'ORDER_ID':'count', 'SUM':'sum'} #словарь с правилом для агрегации
 app = dash.Dash()
 app.layout = html.Div([ # Самый большой контейнер
     html.Div([ # Строка с заголовком и слайдерами
-        html.Div([html.H1('super dash')]#,style={#'float':'left','display': 'inline-block'}
+        html.Div([html.H1('ISD super dashboard')]#,style={#'float':'left','display': 'inline-block'}
         ),
         html.Div([dcc.RangeSlider( # слайдер дней недели
             id = 'week_day_lim',
             marks={i: D_dict[i] for i in range(7)},
             min=0,max=7,
             value=[0, 6]
-                       )], style={'width': '48%','display': 'inline-block'}),
+                       )], style={'width': '50%','display': 'inline-block'}),
                                   #style={'width': '48%','display': 'inline-block','float':'left'}),
         html.Div([dcc.RangeSlider( # слайдер месяца недели
             id = 'month_lim',
             marks={i: M_dict[i] for i in range(12)},
-            min=0,max=12,
-            value=[0, 6]
-                       )], style={'width': '48%','display': 'inline-block'})
-            ],style={'margin':{'l': 0, 'b': 100, 't': 0, 'r': 0}}),
+            min=0,max=11,
+            value=[0, 12]
+                       )], style={'width': '50%','display': 'inline-block'})
+            ], style={'padding': '38px'}),
+
     html.Div([
         html.Div([ # График с деньгами
             html.Div([dcc.Dropdown(
                         id='xaxis-column',
                         options=[{'label': i[1], 'value': i[0]} for i in xs],
                         value='M'
-                    )],style={'width': '48%',#'display': 'inline-block'
-                             }),
+                    )],
+                    style={'width': '45%','float':'left',
+                     'display': 'inline-block',#'background-color': 'cian',
+                     'padding': '10px'}),
             html.Div([dcc.Dropdown(
                         id='yaxis-column',
                         options=[{'label': i[1], 'value': i[0]} for i in ys],
                         value='ORDER_ID'
-                    )],style={'width': '48%','display': 'inline-block'}),
-            dcc.Graph(id='fin_ind',config={'displayModeBar':False})],
-                      style={'width': '50%','hight':'10%',  'display': 'inline-block'}
+                    )],
+                    style={'width': '45%','float':'right',
+                    'display': 'inline-block',#'background-color': 'yellow',
+                    'padding': '10px'}),
+            html.Div([dcc.Graph(id='fin_ind',config={'displayModeBar':False})],
+                        style={'width': '100%','float':'left'}
+
+            )],
+                  style={'width': '50%','float':'left'}
                 ),
+
         html.Div([ # График с social
             html.Div([dcc.Dropdown(
                         id='soc_y',
                         options=[{'label': i[1], 'value': i[0]} for i in ys],
                         value='ORDER_ID'
-                    )],style={'width': '48%','display': 'inline-block'}),
+                    )],
+                    style={'width': '45%','float':'left',
+                     'display': 'inline-block',#'background-color': 'cian',
+                     'padding': '10px'
+                     }),
             html.Div([
                 html.Div([dcc.Checklist(
                         id = 'soc_x',
@@ -70,7 +84,9 @@ app.layout = html.Div([ # Самый большой контейнер
                             {'label': 'Возраст', 'value': 'AGE'}
                         ],
                         values=['SEX', 'AGE'],
-                        labelStyle={'display': 'inline-block'}
+                        labelStyle={'display': 'inline-block'},
+                        #style={'width': '49.9%','float':'left',
+                        # 'display': 'inline-block','background-color': 'cian'}
                     )
                 ]),
                 html.Div([dcc.Checklist(
@@ -91,7 +107,7 @@ app.layout = html.Div([ # Самый большой контейнер
                         labelStyle={'display': 'inline-block'}
                     )
                 ]),
-                ], style = {'width': '50%', 'display': 'inline-block'}
+                ], #style = {'width': '45%', 'float':'right','display': 'inline-block'#,'padding': '10px'}
                 ),
             dcc.Graph(id='soc_ind',config={'displayModeBar':False})],
                       style={'width': '50%', 'display': 'inline-block'})

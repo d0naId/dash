@@ -29,7 +29,7 @@ app.layout = html.Div([ # Самый большой контейнер
         html.Div([dcc.RangeSlider( # слайдер дней недели
             id = 'week_day_lim',
             marks={i: D_dict[i] for i in range(7)},
-            min=0,max=7,
+            min=0,max=6,
             value=[0, 6]
                        )], style={'width': '48%','display': 'inline-block'}),
                                   #style={'width': '48%','display': 'inline-block','float':'left'}),

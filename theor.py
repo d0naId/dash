@@ -18,50 +18,64 @@ x_axis_dict = {'D':['пн','вт','ср','чт','пт','сб','вс'],
                     'August', 'September', 'October', 'November', 'December'],
                'H':range(0,24)}
 D_dict = {0:'пн',1:'вт',2:'ср',3:'чт',4:'пт',5:'сб',6:'вс'}
-M_dict = {0:'January', 1:'February', 2:'March', 3:'April', 4:'May', 5:'June', 6:'July',
-          7:'August', 8:'September', 9:'October', 10:'November', 11:'December'}
+M_dict = {0:'Jan', 1:'Feb', 2:'Mar', 3:'Apr', 4:'May', 5:'Jun', 6:'Jul',
+          7:'Aug', 8:'Sep', 9:'Oct', 10:'Nov', 11:'Dec'}
 agg_dict = {'ORDER_ID':'count', 'SUM':'sum'} #словарь с правилом для агрегации
 app = dash.Dash()
 app.layout = html.Div([ # Самый большой контейнер
     html.Div([ # Строка с заголовком и слайдерами
-        html.Div([html.H1('super dash')]#,style={#'float':'left','display': 'inline-block'}
+        html.Div([html.H1('ISD super dashboard')]#,style={#'float':'left','display': 'inline-block'}
         ),
         html.Div([dcc.RangeSlider( # слайдер дней недели
             id = 'week_day_lim',
             marks={i: D_dict[i] for i in range(7)},
             min=0,max=7,
             value=[0, 6]
-                       )], style={'width': '48%','display': 'inline-block'}),
+                       )], style={'width': '50%','display': 'inline-block'}),
                                   #style={'width': '48%','display': 'inline-block','float':'left'}),
         html.Div([dcc.RangeSlider( # слайдер месяца недели
             id = 'month_lim',
             marks={i: M_dict[i] for i in range(12)},
-            min=0,max=12,
-            value=[0, 6]
-                       )], style={'width': '48%','display': 'inline-block'})
-            ],style={'margin':{'l': 0, 'b': 100, 't': 0, 'r': 0}}),
+            min=0,max=11,
+            value=[0, 12]
+                       )], style={'width': '50%','display': 'inline-block'})
+            ], style={'padding': '38px'}),
+
     html.Div([
         html.Div([ # График с деньгами
             html.Div([dcc.Dropdown(
                         id='xaxis-column',
                         options=[{'label': i[1], 'value': i[0]} for i in xs],
                         value='M'
-                    )],style={'width': '48%',#'display': 'inline-block'
-                             }),
+                    )],
+                    style={'width': '45%','float':'left',
+                     'display': 'inline-block',#'background-color': 'cian',
+                     'padding': '10px'}),
             html.Div([dcc.Dropdown(
                         id='yaxis-column',
                         options=[{'label': i[1], 'value': i[0]} for i in ys],
                         value='ORDER_ID'
-                    )],style={'width': '48%','display': 'inline-block'}),
-            dcc.Graph(id='fin_ind',config={'displayModeBar':False})],
-                      style={'width': '50%','hight':'10%',  'display': 'inline-block'}
+                    )],
+                    style={'width': '45%','float':'right',
+                    'display': 'inline-block',#'background-color': 'yellow',
+                    'padding': '10px'}),
+            html.Div([dcc.Graph(id='fin_ind',config={'displayModeBar':False})],
+                        style={'width': '100%','float':'left'}
+
+            )],
+                  style={'width': '50%','float':'left'}
                 ),
+
         html.Div([ # График с social
             html.Div([dcc.Dropdown(
                         id='soc_y',
                         options=[{'label': i[1], 'value': i[0]} for i in ys],
                         value='ORDER_ID'
-                    )],style={'width': '48%','display': 'inline-block'}),
+                    )],
+                    style={'width': '45%','float':'left',
+                     'display': 'inline-block',#'background-color': 'cian',
+                     'padding': '10px'
+                     }),
             html.Div([
                 html.Div([dcc.Checklist(
                         id = 'soc_x',
@@ -70,7 +84,9 @@ app.layout = html.Div([ # Самый большой контейнер
                             {'label': 'Возраст', 'value': 'AGE'}
                         ],
                         values=['SEX', 'AGE'],
-                        labelStyle={'display': 'inline-block'}
+                        labelStyle={'display': 'inline-block'},
+                        #style={'width': '49.9%','float':'left',
+                        # 'display': 'inline-block','background-color': 'cian'}
                     )
                 ]),
                 html.Div([dcc.Checklist(
@@ -91,7 +107,7 @@ app.layout = html.Div([ # Самый большой контейнер
                         labelStyle={'display': 'inline-block'}
                     )
                 ]),
-                ], style = {'width': '50%', 'display': 'inline-block'}
+                ], #style = {'width': '45%', 'float':'right','display': 'inline-block'#,'padding': '10px'}
                 ),
             dcc.Graph(id='soc_ind',config={'displayModeBar':False})],
                       style={'width': '50%', 'display': 'inline-block'})
@@ -111,10 +127,21 @@ def update_graph_fin(xaxis_column_name, yaxis_column_name, week_day_lim, month_l
                  (finance.M_N>=month_lim[0])&(finance.M_N<=month_lim[1])][
                     [xaxis_column_name,yaxis_column_name]].fillna(0).groupby(
                         xaxis_column_name).agg(agg_dict[yaxis_column_name])
+    print (xaxis_column_name)
+    if xaxis_column_name == 'D':
+        min_x = week_day_lim[0]
+        max_x = week_day_lim[1]
+    elif xaxis_column_name == 'M':
+        min_x = month_lim[0]
+        max_x = month_lim[1]
+    elif xaxis_column_name == 'H':
+        min_x = 0
+        max_x = 25
+
     return {
             'data': [go.Scatter(
-                y=df.loc[x_axis_dict[xaxis_column_name]][yaxis_column_name],
-                x=df.loc[x_axis_dict[xaxis_column_name]].index,
+                y=df.loc[x_axis_dict[xaxis_column_name][min_x:max_x+1]][yaxis_column_name],
+                x=df.loc[x_axis_dict[xaxis_column_name][min_x:max_x+1]].index,
                 text='blablabla',
                 mode='lines+markers',
                 marker={'size': 15, 'opacity': 0.5, 'line': {'width': 0.5, 'color': 'white'}}
@@ -154,28 +181,28 @@ def update_graph_soc(soc_x, soc_y, week_day_lim, month_lim, soc_sexs, soc_ages):
     age_list = ['Не указан','0-4','4-14', '14-21','21-35', '35-50',  '50-']
     if ('SEX' in soc_x) and ('AGE' in soc_x):
         data = [go.Bar(
-            x=sex_list,
+            x = [s for s in sex_list if s in soc_sexs],
             y = [df[(df.SEX==i)&
                   (df.AGE_GROUP == j)][
                   ['SUM']
-                  ].agg(agg_dict[soc_y]).values[0] for i in sex_list],
-            name = j) for j in age_list
+                  ].agg(agg_dict[soc_y]).values[0] for i in sex_list if i in soc_sexs],
+            name = j) for j in age_list if j in soc_ages
             ]
     elif 'SEX' in soc_x:
         data = [go.Bar(
-            x=sex_list,
+            x= [s for s in sex_list if s in soc_sexs],
             y = [df[(df.SEX==i)][
                   ['SUM']
-                  ].agg(agg_dict[soc_y]).values[0] for i in sex_list],
+                  ].agg(agg_dict[soc_y]).values[0] for i in sex_list if i in soc_sexs],
             name = 'value')]
     elif  'AGE' in soc_x:
         data = [
         go.Bar(
-            x=sex_list,
+            x= [s for s in age_list if s in soc_ages],
             y = [df[(df.AGE_GROUP == j)][
                   ['SUM']
-                  ].agg(agg_dict[soc_y]).values[0]],
-            name = j) for j in age_list
+                  ].agg(agg_dict[soc_y]).values[0] for j in age_list if j in soc_ages],
+            name = 'value') 
             ]
     else:
         data = [

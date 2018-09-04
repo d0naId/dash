@@ -8,6 +8,7 @@ import numpy as np
 import plotly.graph_objs as go
 
 finance = pd.read_pickle('finance.pcl') # DF for finance
+tech = pd.read_pickle('tech.pcl') 
 
 xs = np.array([['D', 'Агрегация по дням недели'], ['M','Агрегация по месяцам'], ['H','Агрегация по времени суток']])
 ys = np.array([['ORDER_ID','Количество ордеров (шт)'], ['SUM','Сумма чеков (руб)']])
@@ -64,7 +65,7 @@ app.layout = html.Div([ # Самый большой контейнер
 
             )],
                   style={'width': '50%','float':'left'}
-                ),
+        ),
 
         html.Div([ # График с social
             html.Div([dcc.Dropdown(
@@ -108,11 +109,27 @@ app.layout = html.Div([ # Самый большой контейнер
                     )
                 ]),
                 ], #style = {'width': '45%', 'float':'right','display': 'inline-block'#,'padding': '10px'}
-                ),
+            ),
             dcc.Graph(id='soc_ind',config={'displayModeBar':False})],
-                      style={'width': '50%', 'display': 'inline-block'})
-            ])
-        ])
+                      style={'width': '50%', 'display': 'inline-block'}
+        )
+    ]),
+    html.Div([ #heat_map
+        html.Div(
+            [dcc.Checklist(
+                    id = 'tech_event',
+                    options=[{'label':i, 'value':i}
+                    for i in tech.EVENT.unique()],
+                    values=tech.EVENT.unique(),
+                    labelStyle={'display': 'inline-block'}
+                )],
+            style={'width': '20%','display': 'inline-block'}
+        ),
+        html.Div(
+            style={'width': '70%','display': 'inline-block'}
+        )
+    ])
+])
 @app.callback(dash.dependencies.Output('fin_ind', 'figure'),
                 [dash.dependencies.Input('xaxis-column', 'value'),
                  dash.dependencies.Input('yaxis-column', 'value'),
@@ -202,7 +219,7 @@ def update_graph_soc(soc_x, soc_y, week_day_lim, month_lim, soc_sexs, soc_ages):
             y = [df[(df.AGE_GROUP == j)][
                   ['SUM']
                   ].agg(agg_dict[soc_y]).values[0] for j in age_list if j in soc_ages],
-            name = 'value') 
+            name = 'value')
             ]
     else:
         data = [

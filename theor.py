@@ -123,11 +123,13 @@ app.layout = html.Div([ # Самый большой контейнер
                     values=tech.EVENT.unique(),
                     labelStyle={'display': 'inline-block'}
                 )],
-            style={'width': '20%','display': 'inline-block'}
+            style={'width': '20%','float':'left','display': 'inline-block',
+                   'padding': '10px'}
         ),
         html.Div(
             [dcc.Graph(id='tech_ind')],
-            style={'width': '70%','display': 'inline-block'}
+            style={'width': '70%','float':'left','display': 'inline-block',
+                   'padding': '50px'}
         )
     ])
 ])

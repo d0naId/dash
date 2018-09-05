@@ -8,6 +8,7 @@ import numpy as np
 import plotly.graph_objs as go
 
 finance = pd.read_pickle('finance.pcl') # DF for finance
+tech = pd.read_pickle('tech.pcl')
 
 xs = np.array([['D', 'Агрегация по дням недели'], ['M','Агрегация по месяцам'], ['H','Агрегация по времени суток']])
 ys = np.array([['ORDER_ID','Количество ордеров (шт)'], ['SUM','Сумма чеков (руб)']])
@@ -64,7 +65,7 @@ app.layout = html.Div([ # Самый большой контейнер
 
             )],
                   style={'width': '50%','float':'left'}
-                ),
+        ),
 
         html.Div([ # График с social
             html.Div([dcc.Dropdown(
@@ -108,11 +109,54 @@ app.layout = html.Div([ # Самый большой контейнер
                     )
                 ]),
                 ], #style = {'width': '45%', 'float':'right','display': 'inline-block'#,'padding': '10px'}
-                ),
+            ),
             dcc.Graph(id='soc_ind',config={'displayModeBar':False})],
-                      style={'width': '50%', 'display': 'inline-block'})
-            ])
-        ])
+                      style={'width': '50%', 'display': 'inline-block'}
+        )
+    ]),
+    html.Div([ #heat_map
+        html.Div(
+            [dcc.Checklist(
+                    id = 'tech_event',
+                    options=[{'label':i, 'value':i}
+                    for i in tech.EVENT.unique()],
+                    values=tech.EVENT.unique(),
+                    labelStyle={'display': 'inline-block'}
+                )],
+            style={'width': '20%','display': 'inline-block'}
+        ),
+        html.Div(
+            [dcc.Graph(id='tech_ind')],
+            style={'width': '70%','display': 'inline-block'}
+        )
+    ])
+])
+
+@app.callback(dash.dependencies.Output('tech_ind', 'figure'),
+                [dash.dependencies.Input('tech_event', 'values'),
+                 dash.dependencies.Input('week_day_lim', 'value'),
+                 dash.dependencies.Input('month_lim', 'value')])
+def update_graph_tech(tech_event, week_day_lim, month_lim):
+    df = tech[(tech.D_N>=week_day_lim[0])&(tech.D_N<=week_day_lim[1])&
+              (tech.M_N>=month_lim[0])&(tech.M_N<=month_lim[1])]
+    index_n = [ind in tech_event for ind in df.EVENT]
+    df = df[index_n]
+
+    for_plot = df.pivot_table(values='DATE', columns='H', index = 'DEVICE', aggfunc='count').fillna(0)
+
+    hovertext = list()
+    for yi, yy in enumerate(for_plot.index):
+        hovertext.append(list())
+        for xi, xx in enumerate(for_plot.columns):
+            hovertext[-1].append('устройство: {}<br /> время : {}-{}'.format(yy, xx, xx+1))
+    return {
+        'data': [go.Heatmap(x=for_plot.columns,
+                   y=for_plot.index,
+                   z=for_plot.values,
+                   hoverinfo='z+text',
+                   text = hovertext)]
+    }
+
 @app.callback(dash.dependencies.Output('fin_ind', 'figure'),
                 [dash.dependencies.Input('xaxis-column', 'value'),
                  dash.dependencies.Input('yaxis-column', 'value'),
@@ -127,10 +171,21 @@ def update_graph_fin(xaxis_column_name, yaxis_column_name, week_day_lim, month_l
                  (finance.M_N>=month_lim[0])&(finance.M_N<=month_lim[1])][
                     [xaxis_column_name,yaxis_column_name]].fillna(0).groupby(
                         xaxis_column_name).agg(agg_dict[yaxis_column_name])
+    print (xaxis_column_name)
+    if xaxis_column_name == 'D':
+        min_x = week_day_lim[0]
+        max_x = week_day_lim[1]
+    elif xaxis_column_name == 'M':
+        min_x = month_lim[0]
+        max_x = month_lim[1]
+    elif xaxis_column_name == 'H':
+        min_x = 0
+        max_x = 25
+
     return {
             'data': [go.Scatter(
-                y=df.loc[x_axis_dict[xaxis_column_name]][yaxis_column_name],
-                x=df.loc[x_axis_dict[xaxis_column_name]].index,
+                y=df.loc[x_axis_dict[xaxis_column_name][min_x:max_x+1]][yaxis_column_name],
+                x=df.loc[x_axis_dict[xaxis_column_name][min_x:max_x+1]].index,
                 text='blablabla',
                 mode='lines+markers',
                 marker={'size': 15, 'opacity': 0.5, 'line': {'width': 0.5, 'color': 'white'}}
@@ -170,28 +225,28 @@ def update_graph_soc(soc_x, soc_y, week_day_lim, month_lim, soc_sexs, soc_ages):
     age_list = ['Не указан','0-4','4-14', '14-21','21-35', '35-50',  '50-']
     if ('SEX' in soc_x) and ('AGE' in soc_x):
         data = [go.Bar(
-            x=sex_list,
+            x = [s for s in sex_list if s in soc_sexs],
             y = [df[(df.SEX==i)&
                   (df.AGE_GROUP == j)][
                   ['SUM']
-                  ].agg(agg_dict[soc_y]).values[0] for i in sex_list],
-            name = j) for j in age_list
+                  ].agg(agg_dict[soc_y]).values[0] for i in sex_list if i in soc_sexs],
+            name = j) for j in age_list if j in soc_ages
             ]
     elif 'SEX' in soc_x:
         data = [go.Bar(
-            x=sex_list,
+            x= [s for s in sex_list if s in soc_sexs],
             y = [df[(df.SEX==i)][
                   ['SUM']
-                  ].agg(agg_dict[soc_y]).values[0] for i in sex_list],
+                  ].agg(agg_dict[soc_y]).values[0] for i in sex_list if i in soc_sexs],
             name = 'value')]
     elif  'AGE' in soc_x:
         data = [
         go.Bar(
-            x=sex_list,
+            x= [s for s in age_list if s in soc_ages],
             y = [df[(df.AGE_GROUP == j)][
                   ['SUM']
-                  ].agg(agg_dict[soc_y]).values[0]],
-            name = j) for j in age_list
+                  ].agg(agg_dict[soc_y]).values[0] for j in age_list if j in soc_ages],
+            name = 'value')
             ]
     else:
         data = [

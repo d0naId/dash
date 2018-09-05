@@ -8,7 +8,7 @@ import numpy as np
 import plotly.graph_objs as go
 
 finance = pd.read_pickle('finance.pcl') # DF for finance
-tech = pd.read_pickle('tech.pcl') 
+tech = pd.read_pickle('tech.pcl')
 
 xs = np.array([['D', 'Агрегация по дням недели'], ['M','Агрегация по месяцам'], ['H','Агрегация по времени суток']])
 ys = np.array([['ORDER_ID','Количество ордеров (шт)'], ['SUM','Сумма чеков (руб)']])
@@ -126,10 +126,37 @@ app.layout = html.Div([ # Самый большой контейнер
             style={'width': '20%','display': 'inline-block'}
         ),
         html.Div(
+            [dcc.Graph(id='tech_ind')],
             style={'width': '70%','display': 'inline-block'}
         )
     ])
 ])
+
+@app.callback(dash.dependencies.Output('tech_ind', 'figure'),
+                [dash.dependencies.Input('tech_event', 'values'),
+                 dash.dependencies.Input('week_day_lim', 'value'),
+                 dash.dependencies.Input('month_lim', 'value')])
+def update_graph_tech(tech_event, week_day_lim, month_lim):
+    df = tech[(tech.D_N>=week_day_lim[0])&(tech.D_N<=week_day_lim[1])&
+              (tech.M_N>=month_lim[0])&(tech.M_N<=month_lim[1])]
+    index_n = [ind in tech_event for ind in df.EVENT]
+    df = df[index_n]
+
+    for_plot = df.pivot_table(values='DATE', columns='H', index = 'DEVICE', aggfunc='count').fillna(0)
+
+    hovertext = list()
+    for yi, yy in enumerate(for_plot.index):
+        hovertext.append(list())
+        for xi, xx in enumerate(for_plot.columns):
+            hovertext[-1].append('устройство: {}<br /> время : {}-{}'.format(yy, xx, xx+1))
+    return {
+        'data': [go.Heatmap(x=for_plot.columns,
+                   y=for_plot.index,
+                   z=for_plot.values,
+                   hoverinfo='z+text',
+                   text = hovertext)]
+    }
+
 @app.callback(dash.dependencies.Output('fin_ind', 'figure'),
                 [dash.dependencies.Input('xaxis-column', 'value'),
                  dash.dependencies.Input('yaxis-column', 'value'),

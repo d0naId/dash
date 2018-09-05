@@ -49,19 +49,21 @@ app.layout = html.Div([ # Самый большой контейнер
                         options=[{'label': i[1], 'value': i[0]} for i in xs],
                         value='M'
                     )],
-                    style={'width': '45%','float':'left',
+                    style={'width': '44%','float':'left',
                      'display': 'inline-block',#'background-color': 'cian',
-                     'padding': '10px'}),
+                     #'padding': '10px',
+                      'margin-left':'6%'}),
             html.Div([dcc.Dropdown(
                         id='yaxis-column',
                         options=[{'label': i[1], 'value': i[0]} for i in ys],
                         value='ORDER_ID'
                     )],
-                    style={'width': '45%','float':'right',
+                    style={'width': '44%','float':'right',
                     'display': 'inline-block',#'background-color': 'yellow',
-                    'padding': '10px'}),
+                    #'padding': '10px',
+                    'margin-right':'3%'}),
             html.Div([dcc.Graph(id='fin_ind',config={'displayModeBar':False})],
-                        style={'width': '100%','float':'left'}
+                        style={'width': '100%','float':'left','margin-top':'30px'}
 
             )],
                   style={'width': '50%','float':'left'}
@@ -73,24 +75,29 @@ app.layout = html.Div([ # Самый большой контейнер
                         options=[{'label': i[1], 'value': i[0]} for i in ys],
                         value='ORDER_ID'
                     )],
-                    style={'width': '45%','float':'left',
+                    style={'width': '46%','float':'left',
                      'display': 'inline-block',#'background-color': 'cian',
-                     'padding': '10px'
+                     'margin-left': '7%'
                      }),
-            html.Div([
-                html.Div([dcc.Checklist(
-                        id = 'soc_x',
-                        options=[
-                            {'label': 'Пол', 'value': 'SEX'},
-                            {'label': 'Возраст', 'value': 'AGE'}
-                        ],
-                        values=['SEX', 'AGE'],
-                        labelStyle={'display': 'inline-block'},
-                        #style={'width': '49.9%','float':'left',
-                        # 'display': 'inline-block','background-color': 'cian'}
-                    )
-                ]),
-                html.Div([dcc.Checklist(
+            html.Div([dcc.Checklist(
+                    id = 'soc_x',
+                    options=[
+                        {'label': 'Пол', 'value': 'SEX'},
+                        {'label': 'Возраст', 'value': 'AGE'}
+                    ],
+                    values=['SEX', 'AGE'],
+                    labelStyle={'display': 'inline-block'},
+                )
+            ],style={'width': '25%','float':'left','display': 'inline-block', 'margin-left': '12%','margin-top': '1%'
+            }),
+            html.Div([dcc.Graph(id='soc_ind',config={'displayModeBar':False})],
+                      style={'width': '100%', 'float':'left','margin-top':'30px','display': 'inline-block'#,'padding-top':'20px'
+                      }),
+
+            html.Div([ ##Checklist
+
+                html.Div(#[html.P('Пол:'),
+                    [dcc.Checklist(
                         id = 'soc_sexs',
                         options=[
                             {'label':i, 'value':i} for i in np.array(['Не указан', 'М','Ж'])
@@ -98,7 +105,8 @@ app.layout = html.Div([ # Самый большой контейнер
                         values=['Не указан', 'М','Ж'],
                         labelStyle={'display': 'inline-block'}
                     )
-                ]),
+                ],style={'width': '25%','margin-left': '10%','float':'left','display': 'inline-block'}),
+
                 html.Div([dcc.Checklist(
                         id = 'soc_ages',
                         options=[
@@ -107,32 +115,68 @@ app.layout = html.Div([ # Самый большой контейнер
                         values=['Не указан','0-4','4-14', '14-21','21-35', '35-50',  '50-'],
                         labelStyle={'display': 'inline-block'}
                     )
-                ]),
-                ], #style = {'width': '45%', 'float':'right','display': 'inline-block'#,'padding': '10px'}
-            ),
-            dcc.Graph(id='soc_ind',config={'displayModeBar':False})],
-                      style={'width': '50%', 'display': 'inline-block'}
+                ],style={'width': '60%', 'margin-left': '5%','float':'left','display': 'inline-block'}),
+                ], style = {'width': '100%', 'float':'right','display': 'inline-block', 'padding': '-10px'
+
+                })],#,'padding': '10px'}
+            ##social
+#            dcc.Graph(id='soc_ind',config={'displayModeBar':False})],
+            style={'width': '50%', 'display': 'inline-block'#,'padding-top':'20px'
+                }
         )
-    ]),
+    ],style={'width': '100%','margin-top':'1%'}
+    ),
+    html.Div([
+    #html.Div([],style={'width': '200px', 'float':'left', 'display': 'inline-block',
+    #                    'background-color': 'cian'}),
     html.Div([ #heat_map
+##        html.Div(
+##            [dcc.Checklist(
+##                    id = 'tech_event',
+##                    options=[{'label':i, 'value':i}
+##                    for i in tech.EVENT.unique()],
+##                    values=tech.EVENT.unique(),
+##                    labelStyle={'display': 'inline-block'}
+##                )],
+##            style={'width': '100%',
+##            'float':'left','display': 'inline-block',
+##                   'padding': '5px'}
+##        ),
         html.Div(
-            [dcc.Checklist(
-                    id = 'tech_event',
-                    options=[{'label':i, 'value':i}
-                    for i in tech.EVENT.unique()],
-                    values=tech.EVENT.unique(),
-                    labelStyle={'display': 'inline-block'}
-                )],
-            style={'width': '20%','float':'left','display': 'inline-block',
-                   'padding': '10px'}
-        ),
-        html.Div(
-            [dcc.Graph(id='tech_ind')],
-            style={'width': '70%','float':'left','display': 'inline-block',
-                   'padding': '50px'}
+            [dcc.Graph(id='tech_ind',config={'displayModeBar':False}
+            )],
+            style={'width': '100%',
+            'float':'left','display': 'inline-block',
+                   #'padding-left': '150px', #'border': '10px','border-color': 'black'
+                    }
         )
-    ])
+
+    ],style={'width': '49%',
+            'float':'left','display': 'inline-block',
+            #'display': 'flex',
+            #'justify-content': 'center',
+           'padding-top': '-100px',
+           'margin-left': '20%'
+           }
+    ), ##heat_map
+    #
+    html.Div([
+    html.Div(
+        [dcc.Checklist(
+                id = 'tech_event',
+                options=[{'label':i, 'value':i}
+                for i in tech.EVENT.unique()],
+                values=tech.EVENT.unique(),
+                labelStyle={'display': 'inline-block'}
+            )],
+        style={'width': '200px',
+        'float':'left','display': 'inline-block',
+               'padding-top': '100px'}
+    )
+    ],style={'width': '20%','float':'left','display': 'inline-block'})
 ])
+
+],style={'width': '100%'}) #сабый большой контейнр
 
 @app.callback(dash.dependencies.Output('tech_ind', 'figure'),
                 [dash.dependencies.Input('tech_event', 'values'),

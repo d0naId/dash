@@ -1,11 +1,16 @@
 # -*- coding: utf-8 -*-
 import dash
+import dash_auth
 import dash_core_components as dcc
 import dash_html_components as html
 import sqlite3 as sq
 import pandas as pd
 import numpy as np
 import plotly.graph_objs as go
+
+USERNAME_PASSWORD_PAIRS = [
+    ['ISD', 'ShowMeTheDash'],['D0naid', 'yoyoyo'],['Stepler', 'yoyoyo']
+]
 
 finance = pd.read_pickle('finance.pcl') # DF for finance
 tech = pd.read_pickle('tech.pcl')
@@ -22,7 +27,10 @@ D_dict = {0:'пн',1:'вт',2:'ср',3:'чт',4:'пт',5:'сб',6:'вс'}
 M_dict = {0:'Jan', 1:'Feb', 2:'Mar', 3:'Apr', 4:'May', 5:'Jun', 6:'Jul',
           7:'Aug', 8:'Sep', 9:'Oct', 10:'Nov', 11:'Dec'}
 agg_dict = {'ORDER_ID':'count', 'SUM':'sum'} #словарь с правилом для агрегации
+
 app = dash.Dash()
+auth = dash_auth.BasicAuth(app,USERNAME_PASSWORD_PAIRS)
+
 app.layout = html.Div([ # Самый большой контейнер
     html.Div([ # Строка с заголовком и слайдерами
         html.Div([html.H1('ISD super dashboard')]#,style={#'float':'left','display': 'inline-block'}

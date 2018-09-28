@@ -27,8 +27,10 @@ M_dict = {0:'Jan', 1:'Feb', 2:'Mar', 3:'Apr', 4:'May', 5:'Jun', 6:'Jul',
           7:'Aug', 8:'Sep', 9:'Oct', 10:'Nov', 11:'Dec'}
 agg_dict = {'ORDER_ID':'count', 'SUM':'sum'} #словарь с правилом для агрегации
 
-app = dash.Dash()
+app = dash.Dash(__name__)
+
 auth = dash_auth.BasicAuth(app,USERNAME_PASSWORD_PAIRS)
+server = app.server
 
 app.layout = html.Div([ # Самый большой контейнер
     html.Div([ # Строка с заголовком и слайдерами
@@ -323,6 +325,7 @@ def update_graph_soc(soc_x, soc_y, week_day_lim, month_lim, soc_sexs, soc_ages):
                 hovermode='closest'
             )
         }
+
 
 if __name__ == '__main__':
     app.run_server()

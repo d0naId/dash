@@ -28,6 +28,7 @@ M_dict = {0:'Jan', 1:'Feb', 2:'Mar', 3:'Apr', 4:'May', 5:'Jun', 6:'Jul',
 agg_dict = {'ORDER_ID':'count', 'SUM':'sum'} #словарь с правилом для агрегации
 
 app = dash.Dash(__name__)
+server = app.server
 
 auth = dash_auth.BasicAuth(app,USERNAME_PASSWORD_PAIRS)
 server = app.server
@@ -328,4 +329,4 @@ def update_graph_soc(soc_x, soc_y, week_day_lim, month_lim, soc_sexs, soc_ages):
 
 
 if __name__ == '__main__':
-    app.run_server()
+    app.run_server(debug=True)

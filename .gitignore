@@ -38,3 +38,6 @@ Temporary Items
 .idea/modules.xml
 .idea/vcs.xml
 .idea/workspace.xml
+*.zip
+Connection.ipynb
+.ipynb_checkpoints/Connection-checkpoint.ipynb

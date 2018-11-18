@@ -41,3 +41,4 @@ Temporary Items
 *.zip
 Connection.ipynb
 .ipynb_checkpoints/Connection-checkpoint.ipynb
+dbinfo/access.py

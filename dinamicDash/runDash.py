@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import dash
-# import dash_auth
+import dash_auth
 import dash_core_components as dcc
 import dash_html_components as html
 import sqlite3 as sq
@@ -44,6 +44,7 @@ base_hist_obj.get_new_date(new_max = today)
 
 
 app = dash.Dash(__name__, sharing=True)
+auth = dash_auth.BasicAuth(app,USERNAME_PASSWORD_PAIRS)
 server = app.server
 
 

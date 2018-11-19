@@ -1,0 +1,27 @@
+with cnt_tz as (
+select
+    TO_DATE(TO_CHAR(DATE_TIME, 'DD.MM.YY HH24')
+        ||':'||TO_CHAR(ROUND((TO_NUMBER(TO_CHAR(DATE_TIME, 'MI')))/60)*30),
+        'DD.MM.YYY HH24:MI') HALFH
+    ,TRUNC(DATE_TIME, 'MONTH') as MONTH
+    ,TRUNC(DATE_TIME, 'WW') as WEEK
+    ,TRUNC(DATE_TIME, 'DDD') as DAY
+    ,REPLACE((
+        SELECT PD.DESCRIPTION
+        FROM PHYSICAL_DEVICE PD
+        WHERE PD.IDFROMTREE = TZ.ADR_DEV
+        ),',','_') as DEVICE
+    ,(SELECT TFD.TFD_TEXT
+        FROM TRANZ_FLAG_DESCR TFD
+        WHERE TFD.TFD_ID = TZ.FLAGS
+        ) as EVENT
+FROM TRANZ TZ
+WHERE TZ.CARD_NUM IS NOT NULL
+and DATE_TIME<'{0}' and DATE_TIME>'{1}'
+)
+select * from cnt_tz
+where DEVICE in ('Тур.№3 KABA-ВХОД',
+                 'Тур.№4 KABA-КАССА (Правый)',
+                 'Тур.№1 KABA-ВЫХОД (Левый)',
+                 'Тур.№2 KABA-КАССА (2-ой слева)',
+                 'Тур.№7 Skidata (Соляная)')

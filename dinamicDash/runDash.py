@@ -6,19 +6,57 @@ import dash_html_components as html
 import sqlite3 as sq
 import pandas as pd
 import numpy as np
+import datetime
 import plotly.graph_objs as go
+import sys
+path2root = '.'
+sys.path.append(path2root)
+from utils.dbAPI import DataPrepare
+from dbinfo.access import db_acc_dict, USERNAME_PASSWORD_PAIRS
+
+#new params
+host = db_acc_dict['host']
+port = db_acc_dict['port']
+service_name = db_acc_dict['service_name']
+user = db_acc_dict['user']
+passwd = db_acc_dict['passwd']
+
+# Load data hear
+## hist graph base
+### read request
+turTransaction = open('./requests/turTransaction.txt', 'r', encoding="utf-8").read()
+
+### HARD CODE
+min_date = '01.10.2017'
+max_date = '03.01.2018'
+
+### declarate object
+base_hist_obj = DataPrepare(min_date, max_date, turTransaction)
+print('Loading data')
+
+base_hist_obj.connection(user, passwd, host, port, service_name)
+base_hist_obj.take_data()
+
+today = '04.01.2018'
+print('Load one more day')
+base_hist_obj.get_new_date(new_max = today)
+
+
 
 app = dash.Dash(__name__, sharing=True)
 server = app.server
 
-USERNAME_PASSWORD_PAIRS = [
-    ['ISD', 'ShowMeTheDash'],['D0naid', 'yoyoyo'],['Stepler', 'yoyoyo']]
 
 app.layout = html.Div(
     [ # Самый большой контейнер
     html.Div([html.H1('ISD super dashboard')]), # Заголовок
     html.Div(
         [
+        html.Div([
+        html.P('Выберети интересующие Вас действия')],
+               style={'float':'left',
+                  'margin-top':'30px',
+                  'display': 'inline-block'}),
         dcc.Checklist(
                 id = 'EVENT',
                 options=[
@@ -33,16 +71,11 @@ app.layout = html.Div(
                 'открытие из кассы', 'вход после таймаута'],
                 labelStyle={'display': 'inline-block', 'float':'left'}
             ),  # Закончился Checklist EVENT
-        dcc.Dropdown(
-            id = 'GROUPER',
-            options=[
-                {'label': '30 мин', 'value': 'HALFH'},
-                {'label': '1 день', 'value': 'DAY'},
-                {'label': '1 неделя', 'value': 'WEEK'},
-                {'label': '1 месяц', 'value': 'MONTH'}
-            ],
-            value='HALFH'
-            ), # Закончился Dropdown
+        html.Div([
+        html.P('Выберите турникеты')],
+               style={'float':'left',
+                  'margin-top':'30px',
+                  'display': 'inline-block'}),
         dcc.Checklist(
                 id = 'DEVICE',
                 options=[
@@ -57,20 +90,67 @@ app.layout = html.Div(
                         'Тур.№4 KABA-КАССА (Правый)'],
                 labelStyle={'display': 'inline-block', 'float':'left'}
             ),   # Закончился Checklist DEVICE
+        html.Div([
+        html.P('Введите кол-во дней')],
+               style={'float':'left',
+                  'margin-top':'30px',
+                  'display': 'inline-block'}),
         dcc.Input(
             id = 'HIST',
             placeholder='Количество дней',
             type='text',
             value='3'
-            )  #Закончился Input
-        ], style={'width': '200px',
+            ),  #Закончился Input
+        ], style={'width': '19%',
                   'float':'left','display': 'inline-block',
                   'padding-top': '50px'}),  # Dash Core Components
-    # html.Div([
-    #     dcc.Graph(id='bar_time',config={'displayModeBar':False}
-    #     ])
+
+    html.Div([
+        html.Div([
+        html.Div([
+        html.P('Укажите частоту дискретизации')],
+               style={'float':'left',
+                  'margin-top':'30px',
+                  'display': 'inline-block'}),
+        dcc.Dropdown(
+            id = 'GROUPER',
+            options=[
+                {'label': '30 мин', 'value': 'HALFH'},
+                {'label': '1 день', 'value': 'DAY'},
+                {'label': '1 неделя', 'value': 'WEEK'},
+                {'label': '1 месяц', 'value': 'MONTH'}
+            ],
+            value='HALFH'
+            ) # Закончился Dropdown
+        ], style={'width': '50%'}),
+
+        dcc.Graph(id='bar_time',config={'displayModeBar':False})
+        ], style={'width': '80%', 'float':'left',
+                  'margin-top':'30px',
+                  'display': 'inline-block'})
     ]) # Закончился Самый большой контейнер
 
+@app.callback(dash.dependencies.Output('bar_time', 'figure'),
+              [dash.dependencies.Input('EVENT', 'values'),
+               dash.dependencies.Input('GROUPER', 'value'),
+               dash.dependencies.Input('DEVICE', 'values'),
+               dash.dependencies.Input('HIST', 'value')])
+def update_bar_time(EVENT, GROUPER, DEVICE, HIST):
+    df_test = base_hist_obj.df
+    base_hist_obj.get_new_date(new_max = today)
+    df_for_plot = df_test[df_test.HALFH>(df_test.HALFH.max()-datetime.timedelta(days=int(HIST)))]
+
+    event_mask = [event_row in EVENT for event_row in df_for_plot.EVENT]
+    device_mask = [device_row in DEVICE for device_row in df_for_plot.DEVICE]
+    df_for_plot = df_for_plot[event_mask and device_mask]
+    print(df_for_plot.groupby(GROUPER).EVENT.count().shape)
+
+    data = [go.Bar(
+            y = df_for_plot.groupby(GROUPER).EVENT.count(),
+            x = df_for_plot.groupby(GROUPER).count().index
+    )]
+
+    return {'data': data}
 
 if __name__ == '__main__':
     app.run_server()

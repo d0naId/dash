@@ -4,6 +4,10 @@
 .AppleDouble
 .LSOverride
 
+# some files
+access.cpython-36.pyc
+dbAPI.cpython-36.pyc
+
 #DB and pickle
 isd_base.db
 finance.pcl

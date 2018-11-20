@@ -37,7 +37,7 @@ print('Loading data')
 base_hist_obj.connection(user, passwd, host, port, service_name)
 base_hist_obj.take_data()
 
-today = '04.01.2018'
+today = '05.01.2018'
 print('Load one more day')
 base_hist_obj.get_new_date(new_max = today)
 

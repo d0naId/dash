@@ -27,7 +27,7 @@ passwd = db_acc_dict['passwd']
 turTransaction = open('./requests/turTransaction.txt', 'r', encoding="utf-8").read()
 
 ### HARD CODE
-min_date = '01.10.2017'
+min_date = '29.12.2017'
 max_date = '03.01.2018'
 
 ### declarate object
@@ -37,7 +37,7 @@ print('Loading data')
 base_hist_obj.connection(user, passwd, host, port, service_name)
 base_hist_obj.take_data()
 
-today = '04.01.2018'
+today = '05.01.2018'
 print('Load one more day')
 base_hist_obj.get_new_date(new_max = today)
 
@@ -136,15 +136,17 @@ app.layout = html.Div(
                dash.dependencies.Input('GROUPER', 'value'),
                dash.dependencies.Input('DEVICE', 'values'),
                dash.dependencies.Input('HIST', 'value')])
+
 def update_bar_time(EVENT, GROUPER, DEVICE, HIST):
     df_test = base_hist_obj.df
     base_hist_obj.get_new_date(new_max = today)
-    df_for_plot = df_test[df_test.HALFH>(df_test.HALFH.max()-datetime.timedelta(days=int(HIST)))]
 
-    event_mask = [event_row in EVENT for event_row in df_for_plot.EVENT]
-    device_mask = [device_row in DEVICE for device_row in df_for_plot.DEVICE]
-    df_for_plot = df_for_plot[event_mask and device_mask]
-    print(df_for_plot.groupby(GROUPER).EVENT.count().shape)
+    df_for_plot = df_test[df_test.HALFH > (df_test.HALFH.max() - datetime.timedelta(days=int(HIST))) ]
+    event_mask = np.array([event_row in EVENT for event_row in df_for_plot.EVENT])
+    device_mask = np.array([device_row in DEVICE for device_row in df_for_plot.DEVICE])
+    df_for_plot = df_for_plot[event_mask & device_mask]
+
+    print('df_for_plot_mask', df_for_plot.shape)
 
     data = [go.Bar(
             y = df_for_plot.groupby(GROUPER).EVENT.count(),

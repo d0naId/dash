@@ -3,20 +3,14 @@ import dash
 import dash_auth
 import dash_core_components as dcc
 import dash_html_components as html
-import sqlite3 as sq
 import pandas as pd
 import numpy as np
 import plotly.graph_objs as go
-import plotly.plotly as py
 
-py.sign_in('astepankoff', 'On8qdeiL0m9WEuSmJWak')
-
-USERNAME_PASSWORD_PAIRS = [
-    ['ISD', 'ShowMeTheDash'],['D0naid', 'yoyoyo'],['Stepler', 'yoyoyo']
-]
+USERNAME_PASSWORD_PAIRS = [['ISD', 'ShowMeTheDash'],['D0naid', 'yoyoyo'],['Stepler', 'yoyoyo']]
 
 
-path = r'../my_dash_app/{}'
+path = r'../../my_dash_app/{}'
 
 finance = pd.read_pickle(path.format('finance.pcl')) # DF for finance
 tech = pd.read_pickle(path.format('tech.pcl'))

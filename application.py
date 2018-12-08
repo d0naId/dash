@@ -318,4 +318,5 @@ def update_graph_soc(soc_x, soc_y, week_day_lim, month_lim, soc_sexs, soc_ages):
         }
 
 if __name__ == '__main__':
-    app.run_server(debug=True, port=8080)
+    app.run_server(debug=True)
+    #app.run_server(debug=True, port=8080)

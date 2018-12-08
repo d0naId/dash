@@ -1,0 +1,78 @@
+.grid {
+	display: grid;
+	grid-gap: 10px;
+	grid-template-areas:
+		"header"
+		"options"
+		"statistic"
+		"graph"
+		"aside";
+}
+
+.header{
+	grid-area: header;
+}
+
+.graph{
+	grid-area: graph;
+}
+
+.options{
+	grid-area: options;
+}
+
+.aside {
+	grid-area: aside;
+}
+
+.statistic{
+	grid-area: statistic;
+	display: grid;
+	grid-template-columns: 1fr;
+	grid-gap: 10px;
+	padding: 0px 0px;
+}
+
+.statistic > *:nth-child(odd) {
+	background-color: #475477;
+}
+
+.statistic > * {
+	background-color: #28314E;
+	border: 1px solid #212941;
+	border-radius: 5px;
+	padding: 8px 15px;
+	color: #ffffff;
+	font-size: 18px;
+	font-family: roboto;
+}
+
+
+
+footer {
+	grid-area: footer;
+}
+
+@media (min-width: 640px) {
+	.grid {
+		grid-template-columns: 2fr 4fr 2fr;
+		grid-template-areas:
+			"header header header"
+			"options options options"
+			"statistic graph aside"
+	}
+}
+
+.grid > * {
+	background-color: #28314E;
+	border: 1px solid #212941;
+	border-radius: 5px;
+	padding: 8px 15px;
+	color: #ffffff;
+	font-size: 18px;
+	font-family: roboto;
+}
+
+.grid > *:nth-child(odd) {
+	background-color: #475477;
+}

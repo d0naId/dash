@@ -1,0 +1,12 @@
+.right-frame{
+  display: grid;
+  grid-template-rows: 1fr 6fr 2fr;
+}
+
+
+.options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-auto-rows: 100px;
+  background-color: blue;
+}

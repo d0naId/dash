@@ -27,6 +27,7 @@ class DataPrepare():
 
     def take_data(self):
         self.df = self.db.request(self.req.format(self.max_date, self.min_date))
+
     def get_new_date(self, new_max):
         if new_max > self.max_date:
             self.df = self.df.append(self.db.request(self.req.format(new_max, self.max_date)))

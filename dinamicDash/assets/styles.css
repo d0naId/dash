@@ -1,0 +1,56 @@
+body {
+    min-height:100vh;
+}
+
+#_dash-app-content {
+  background-color: green;
+}
+
+#layout {
+  display: grid;
+  grid-template-columns: minmax(310px 500px) minmax(1fr 10fr);
+}
+
+#header {
+  grid-area: header;
+}
+
+#left-frame {
+  display: grid;
+  grid-area: left-frame;
+  grid-template-rows: 1fr 3fr 1fr 3fr;
+  margin-top: 30px;
+  width: minmax(310px 500px);
+}
+
+#righr-frame {
+  display: grid;
+  grid-area: right-frame;
+  grid-template-rows: 1fr 3fr 1fr 3fr;
+  margin-top: 30px;
+  width: minmax(310px 500px);
+}
+
+.checklist {
+  display: inline-block;
+  float: left;
+  margin-right : 10px
+}
+
+.checklist label {
+  display: inline-block;
+  float: left;
+}
+
+#EVENT{
+  width: 200px
+}
+
+#DEVICE{
+  width: 300px
+}
+
+.options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}

@@ -1,0 +1,17 @@
+#_dash-app-content {
+  background-color: green;
+  min-height:100vh;
+}
+
+.layout {
+  min-height:100vh;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: hotpink
+}
+
+body {
+    font-family: sans-serif;
+    min-height:100vh;
+}

@@ -3,7 +3,15 @@
 .DS_Store
 .AppleDouble
 .LSOverride
+<<<<<<< HEAD
 .idea
+=======
+
+# some files
+access.cpython-36.pyc
+dbAPI.cpython-36.pyc
+
+>>>>>>> dev/step_var
 #DB and pickle
 isd_base.db
 finance.pcl
@@ -33,9 +41,21 @@ Temporary Items
 
 # End of https://www.gitignore.io/api/macos
 *.pcl
+<<<<<<< HEAD
 venv
 *.pyc
 *.DS_Store
 .env
 auth1.py
 appdemo.py
+=======
+*.iml
+.idea/misc.xml
+.idea/modules.xml
+.idea/vcs.xml
+.idea/workspace.xml
+*.zip
+Connection.ipynb
+.ipynb_checkpoints/Connection-checkpoint.ipynb
+dbinfo/access.py
+>>>>>>> dev/step_var

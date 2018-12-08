@@ -15,8 +15,15 @@ USERNAME_PASSWORD_PAIRS = [
     ['ISD', 'ShowMeTheDash'],['D0naid', 'yoyoyo'],['Stepler', 'yoyoyo']
 ]
 
+<<<<<<< HEAD
 finance = pd.read_pickle('finance.pcl') # DF for finance
 tech = pd.read_pickle('tech.pcl')
+=======
+path = r'../../my_dash_app/{}'
+
+finance = pd.read_pickle(path.format('finance.pcl')) # DF for finance
+tech = pd.read_pickle(path.format('tech.pcl'))
+>>>>>>> dev/step_var
 
 xs = np.array([['D', 'Агрегация по дням недели'], ['M','Агрегация по месяцам'], ['H','Агрегация по времени суток']])
 ys = np.array([['ORDER_ID','Количество ордеров (шт)'], ['SUM','Сумма чеков (руб)']])
@@ -274,7 +281,11 @@ def update_graph_soc(soc_x, soc_y, week_day_lim, month_lim, soc_sexs, soc_ages):
     agg_dict = {'ORDER_ID':'count', 'SUM':'sum'} #словарь с правилом для агрегации
     axis_name_dict = {'ORDER_ID':'Количество орддеров','SUM':'Сумма чеков',
                       'D':'День недели','H':'Время (часы)','M':'Месяц'} # СЛоварь для подписей к осям
+<<<<<<< HEAD
     social = pd.read_pickle('social.pcl')
+=======
+    social = pd.read_pickle(path.format('social.pcl'))
+>>>>>>> dev/step_var
     df = social[(social.D_N>=week_day_lim[0])&(social.D_N<=week_day_lim[1])&
                  (social.M_N>=month_lim[0])&(social.M_N<=month_lim[1])]
     df = df[[i in soc_sexs for i in df.SEX]]
